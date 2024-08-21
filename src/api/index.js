@@ -1,7 +1,6 @@
 import axios from 'axios';
 import qs from 'qs';
 
-// Retrieve client credentials from environment variables
 const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
 const clientSecret = import.meta.env.VITE_SPOTIFY_CLIENT_SECRET;
 
@@ -19,36 +18,47 @@ export async function getSpotifyToken() {
 
   try {
     const response = await axios.post(tokenUrl, data, { headers });
+    // setToken(response.data.access_token);
     return response.data.access_token;
   } catch (error) {
     console.error('Error getting Spotify token:', error);
     return null;
   }
 }
-export async function getTopTrendingTracks(playlistId) {
-  const accessToken = await getSpotifyToken();
-  if (!accessToken) return null;
+
+
+export async function getTracks(playlistId, offset = 0) {
+  const token = await getSpotifyToken();
+  const limit=10;
+  if (!token) return [];
+
   const playlistUrl = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
 
   const headers = {
-    'Authorization': `Bearer ${accessToken}`
+    'Authorization': `Bearer ${token}`
   };
 
   try {
-    const response = await axios.get(playlistUrl, { headers });
+    const response = await axios.get(playlistUrl, {
+      headers,
+      params: {
+        offset,
+        limit
+      }
+    });
+
     const tracks = response.data.items.map(item => item.track);
 
-    // Extract the top 10 tracks information
-    const top10Tracks = tracks.slice(0, 10);
-    return top10Tracks;
+    // Return the fetched tracks
+    return tracks;
   } catch (error) {
-    console.error('Error fetching top trending tracks:', error);
-    return null;
+    console.error('Error fetching playlist tracks:', error);
+    return [];
   }
 }
+
 export const getPlaylists = async () => {
   const token = await getSpotifyToken();
-  console.log(token)
   const response = await axios.get('https://api.spotify.com/v1/browse/categories/toplists/playlists?country=IN', {
     headers: {
       'Authorization': `Bearer ${token}`
@@ -58,6 +68,7 @@ export const getPlaylists = async () => {
 };
 export const getSongs = async (query) => {
   const token = await getSpotifyToken();
+  if (!token) return null;
   const response = await axios.get('https://api.spotify.com/v1/search', {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -69,6 +80,49 @@ export const getSongs = async (query) => {
     },
   });
 
-  console.log(response)
   return response.data.tracks.items; // This will return an array of tracks
 };
+
+
+const playlists = [
+  '37i9dQZF1DXcBWIGoYBM5M', // Today's Top Hits
+  '37i9dQZEVXbMDoHDwVN2tF', // Top 50 - Global
+  '37i9dQZF1DX0XUsuxWHRQd', // RapCaviar
+  '37i9dQZF1DX1lVhptIYRda', // Hot Country
+  '37i9dQZF1DX10zKzsJ2jva', // Viva Latino
+  '37i9dQZF1DX4dyzvuaRJ0n', // Mint
+  '37i9dQZF1DWXRqgorJj26U', // Rock Classics
+  '37i9dQZF1DX4SBhb3fqCJd', // Are & Be
+  '37i9dQZF1DX4sWSpwq3LiO', // Peaceful Piano
+  '37i9dQZF1DX4UtSsGT1Sbe'  // All Out 80s
+];
+
+
+export const fetchAllPlaylistData = async () => {
+  const token = await getSpotifyToken();
+  if (!token) return null;
+  const playlistData = await Promise.all(
+    playlists.map(async (id) => {
+      const response = await axios.get(`https://api.spotify.com/v1/playlists/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    })
+  );
+  return playlistData;
+};
+export const getPlaylistData = async (id) => {
+  const token = await getSpotifyToken();
+  if (!token) return null;
+  const playlistData = await axios.get(`https://api.spotify.com/v1/playlists/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+       
+      });
+     
+  return playlistData.data;
+};
+

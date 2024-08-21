@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react';
 
 const PlayerContext = createContext();
 
@@ -9,15 +9,18 @@ const PlayerContextProvider = ({ children }) => {
   const seekBg = useRef(null);
   const seekBar = useRef(null);
 
+  // Initialize track with default data
   const [track, setTrack] = useState({
-    name: "zare se",
+    id: '',
+    name: 'No Track Selected',
     album: {
-      name: "zara",
-      images: ""
-    }
+      name: 'Unknown Album',
+      images: [{ url: '' }]
+    },
+    preview_url: ''
   });
-  const [query, setQuery] = useState(null);
-  const [playlist, setPlaylistContext] = useState(null);
+  const [query, setQuery] = useState("");
+  const [playlist, setPlaylistContext] = useState([]);
   const [playlistinfo, setPlaylistContextInfo] = useState(null);
   const [playStatus, setPlayStatus] = useState(false);
   const [time, setTime] = useState({
@@ -25,67 +28,69 @@ const PlayerContextProvider = ({ children }) => {
     totalTime: { minute: 0, second: 0 },
   });
 
-  const playTrack = (currentTrack) => {
+  const playTrack = useCallback((currentTrack) => {
     if (currentTrack && audioRef.current) {
       audioRef.current.src = currentTrack.preview_url;
-      audioRef.current.play();
+      audioRef.current.play().catch(err => console.error('Error playing track:', err));
       setTrack(currentTrack);
       setPlayStatus(true);
     }
-  };
+  }, []);
 
-  const play = () => {
+  const play = useCallback(() => {
     if (audioRef.current) {
-      audioRef.current.play();
+      audioRef.current.play().catch(err => console.error('Error playing audio:', err));
       setPlayStatus(true);
     }
-  };
+  }, []);
 
-  const pause = () => {
+  const pause = useCallback(() => {
     if (audioRef.current) {
       audioRef.current.pause();
       setPlayStatus(false);
     }
-  };
-  const previous = () => {
-    const songsData = playlist;
-    const currentIndex = songsData.findIndex((song) => song.id === track.id);
-    if (currentIndex > 0) {
-      const prevTrack = songsData[currentIndex - 1];
-      setTrack(prevTrack);
-      if (audioRef.current) {
-        audioRef.current.src = prevTrack.preview_url;
-        audioRef.current.play();
-        setPlayStatus(true);
-      }
-    }
-  };
+  }, []);
 
-  const next = () => {
-    const songsData = playlist;
-    const currentIndex = songsData.findIndex((song) => song.id === track.id);
-    if (currentIndex < songsData.length - 1) {
-      const nextTrack = songsData[currentIndex + 1];
-      setTrack(nextTrack);
-      if (audioRef.current) {
-        audioRef.current.src = nextTrack.preview_url;
-        audioRef.current.play();
-        setPlayStatus(true);
+  const previous = useCallback(() => {
+    if (playlist.length > 0) {
+      const currentIndex = playlist.findIndex((song) => song.id === track.id);
+      if (currentIndex > 0) {
+        const prevTrack = playlist[currentIndex - 1];
+        setTrack(prevTrack);
+        if (audioRef.current) {
+          audioRef.current.src = prevTrack.preview_url;
+          audioRef.current.play().catch(err => console.error('Error playing previous track:', err));
+          setPlayStatus(true);
+        }
       }
     }
-  };
-  console.log(playlist)
-  const seekSong = (e) => {
+  }, [playlist, track]);
+
+  const next = useCallback(() => {
+    if (playlist.length > 0) {
+      const currentIndex = playlist.findIndex((song) => song.id === track.id);
+      if (currentIndex < playlist.length - 1) {
+        const nextTrack = playlist[currentIndex + 1];
+        setTrack(nextTrack);
+        if (audioRef.current) {
+          audioRef.current.src = nextTrack.preview_url;
+          audioRef.current.play().catch(err => console.error('Error playing next track:', err));
+          setPlayStatus(true);
+        }
+      }
+    }
+  }, [playlist, track]);
+
+  const seekSong = useCallback((e) => {
     if (audioRef.current && seekBg.current) {
       audioRef.current.currentTime =
         (e.nativeEvent.offsetX / seekBg.current.offsetWidth) *
         audioRef.current.duration;
     }
-  };
+  }, []);
 
   useEffect(() => {
     const handleTimeUpdate = () => {
-
       if (audioRef.current && seekBar.current) {
         seekBar.current.style.width =
           Math.floor(
@@ -132,13 +137,15 @@ const PlayerContextProvider = ({ children }) => {
     time,
     playlist,
     setPlaylistContext,
-    playlistinfo, setPlaylistContextInfo,
-    query, setQuery
+    playlistinfo,
+    setPlaylistContextInfo,
+    query,
+    setQuery,
   };
 
   return (
     <PlayerContext.Provider value={contextValue}>
-      <audio src="" ref={audioRef}></audio>
+      <audio ref={audioRef} />
       {children}
     </PlayerContext.Provider>
   );
