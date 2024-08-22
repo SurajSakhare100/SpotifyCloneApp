@@ -6,7 +6,6 @@ import PlayerContextProvider, { usePlayer } from "./context/PlayerContext"
 import Navbar from "./components/Navbar"
 
 const App = () => {
-  const { audioRef, track } = usePlayer()
   return (
     <PlayerContextProvider >
       <div className="w-full h-screen bg-black font-poppins">

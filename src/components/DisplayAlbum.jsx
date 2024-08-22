@@ -4,8 +4,7 @@ import { usePlayer } from '../context/PlayerContext';
 import { FaClock } from 'react-icons/fa';
 import { getPlaylistData, getTracks } from '../api/index.js';
 import { millisecondsToMMSS } from '../utils';
-import { assets } from '../assets/assets';
-
+import spotifyLogo from '/assets/spotify_logo.png'
 const DisplayAlbum = () => {
   const [tracks, setTracks] = useState([]);
   const [playlist, setPlaylist] = useState(null);
@@ -99,7 +98,7 @@ const DisplayAlbum = () => {
             <p className="mt-1">
               <img
                 className="inline-block w-5"
-                src={assets.spotify_logo}
+                src={spotifyLogo}
                 alt="Spotify logo"
               />
               <b> {playlist?.owner.display_name} </b>

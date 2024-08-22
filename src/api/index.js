@@ -57,7 +57,7 @@ export async function getTracks(playlistId, offset = 0) {
   }
 }
 
-export const getPlaylists = async () => {
+export const getTopPlayListInIndia = async () => {
   const token = await getSpotifyToken();
   const response = await axios.get('https://api.spotify.com/v1/browse/categories/toplists/playlists?country=IN', {
     headers: {
@@ -83,36 +83,6 @@ export const getSongs = async (query) => {
   return response.data.tracks.items; // This will return an array of tracks
 };
 
-
-const playlists = [
-  '37i9dQZF1DXcBWIGoYBM5M', // Today's Top Hits
-  '37i9dQZEVXbMDoHDwVN2tF', // Top 50 - Global
-  '37i9dQZF1DX0XUsuxWHRQd', // RapCaviar
-  '37i9dQZF1DX1lVhptIYRda', // Hot Country
-  '37i9dQZF1DX10zKzsJ2jva', // Viva Latino
-  '37i9dQZF1DX4dyzvuaRJ0n', // Mint
-  '37i9dQZF1DWXRqgorJj26U', // Rock Classics
-  '37i9dQZF1DX4SBhb3fqCJd', // Are & Be
-  '37i9dQZF1DX4sWSpwq3LiO', // Peaceful Piano
-  '37i9dQZF1DX4UtSsGT1Sbe'  // All Out 80s
-];
-
-
-export const fetchAllPlaylistData = async () => {
-  const token = await getSpotifyToken();
-  if (!token) return null;
-  const playlistData = await Promise.all(
-    playlists.map(async (id) => {
-      const response = await axios.get(`https://api.spotify.com/v1/playlists/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      return response.data;
-    })
-  );
-  return playlistData;
-};
 export const getPlaylistData = async (id) => {
   const token = await getSpotifyToken();
   if (!token) return null;
@@ -126,3 +96,24 @@ export const getPlaylistData = async (id) => {
   return playlistData.data;
 };
 
+export const getCategoryPlaylists = async (categoryId) => {
+  const token = await getSpotifyToken();
+  if (!token) return null;
+  const config = {
+    method: 'get',
+    url: `https://api.spotify.com/v1/browse/categories/${categoryId}/playlists`,
+    headers: {
+      'Authorization': `Bearer ${token}`
+    },params:{
+      limit:10,
+    }}
+
+  try {
+    const response = await axios(config);
+    const playlists = response.data.playlists.items;
+
+    return playlists;
+  } catch (error) {
+    console.error('Error fetching top artists:', error.response.data);
+  }
+}; 

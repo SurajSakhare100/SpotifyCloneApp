@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react';
-
+import img from '../../public/assets/img5.jpg';
+import song from '../../public/assets/song5.mp3'; // Importing the audio file
 const PlayerContext = createContext();
 
 export const usePlayer = () => useContext(PlayerContext);
@@ -12,12 +13,15 @@ const PlayerContextProvider = ({ children }) => {
   // Initialize track with default data
   const [track, setTrack] = useState({
     id: '',
-    name: 'No Track Selected',
+    name: 'Illuminati',
     album: {
-      name: 'Unknown Album',
-      images: [{ url: '' }]
+      name: 'Illuminati',
+      images: [{ url: img }]
     },
-    preview_url: ''
+    artists: [{
+      name: "Vinayak Sasikumar"
+    }],
+    preview_url: song
   });
   const [query, setQuery] = useState("");
   const [playlist, setPlaylistContext] = useState([]);
@@ -56,54 +60,46 @@ const PlayerContextProvider = ({ children }) => {
       const currentIndex = playlist.findIndex((song) => song.id === track.id);
       if (currentIndex > 0) {
         const prevTrack = playlist[currentIndex - 1];
-        setTrack(prevTrack);
-        if (audioRef.current) {
-          audioRef.current.src = prevTrack.preview_url;
-          audioRef.current.play().catch(err => console.error('Error playing previous track:', err));
-          setPlayStatus(true);
-        }
+        playTrack(prevTrack);
       }
     }
-  }, [playlist, track]);
+  }, [playlist, track, playTrack]);
 
   const next = useCallback(() => {
     if (playlist.length > 0) {
       const currentIndex = playlist.findIndex((song) => song.id === track.id);
-      if (currentIndex < playlist.length - 1) {
+      if (currentIndex >= 0 && currentIndex < playlist.length - 1) {
         const nextTrack = playlist[currentIndex + 1];
-        setTrack(nextTrack);
-        if (audioRef.current) {
-          audioRef.current.src = nextTrack.preview_url;
-          audioRef.current.play().catch(err => console.error('Error playing next track:', err));
-          setPlayStatus(true);
-        }
+        playTrack(nextTrack);
       }
     }
-  }, [playlist, track]);
+  }, [playlist, track, playTrack]);
 
   const seekSong = useCallback((e) => {
     if (audioRef.current && seekBg.current) {
+      const duration = audioRef.current.duration || 0;
       audioRef.current.currentTime =
-        (e.nativeEvent.offsetX / seekBg.current.offsetWidth) *
-        audioRef.current.duration;
+        (e.nativeEvent.offsetX / seekBg.current.offsetWidth) * duration;
     }
   }, []);
 
   useEffect(() => {
     const handleTimeUpdate = () => {
       if (audioRef.current && seekBar.current) {
+        const duration = audioRef.current.duration || 0;
+        const currentTime = audioRef.current.currentTime || 0;
+
         seekBar.current.style.width =
-          Math.floor(
-            (audioRef.current.currentTime / audioRef.current.duration) * 100
-          ) + '%';
+          Math.floor((currentTime / duration) * 100) + '%';
+
         setTime({
           currentTime: {
-            second: Math.floor(audioRef.current.currentTime % 60),
-            minute: Math.floor(audioRef.current.currentTime / 60),
+            second: Math.floor(currentTime % 60),
+            minute: Math.floor(currentTime / 60),
           },
           totalTime: {
-            second: Math.floor(audioRef.current.duration % 60),
-            minute: Math.floor(audioRef.current.duration / 60),
+            second: Math.floor(duration % 60),
+            minute: Math.floor(duration / 60),
           },
         });
       }
@@ -118,7 +114,7 @@ const PlayerContextProvider = ({ children }) => {
         audioRef.current.removeEventListener('timeupdate', handleTimeUpdate);
       }
     };
-  }, [audioRef]);
+  }, [audioRef,playStatus,playlist,track]);
 
   const contextValue = {
     audioRef,
@@ -145,7 +141,7 @@ const PlayerContextProvider = ({ children }) => {
 
   return (
     <PlayerContext.Provider value={contextValue}>
-      <audio ref={audioRef} />
+      <audio ref={audioRef} src={track.preview_url}/>
       {children}
     </PlayerContext.Provider>
   );
