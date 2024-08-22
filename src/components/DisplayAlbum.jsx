@@ -1,10 +1,11 @@
 import { useParams } from 'react-router-dom';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { usePlayer } from '../context/PlayerContext';
 import { FaClock } from 'react-icons/fa';
 import { getPlaylistData, getTracks } from '../api/index.js';
 import { millisecondsToMMSS } from '../utils';
-import spotifyLogo from '/assets/spotify_logo.png'
+import spotifyLogo from '/assets/spotify_logo.png';
+
 const DisplayAlbum = () => {
   const [tracks, setTracks] = useState([]);
   const [playlist, setPlaylist] = useState(null);
@@ -31,10 +32,8 @@ const DisplayAlbum = () => {
           setHasMore(false);
         }
 
-        // Ensure prevTracks is always an array
+        // Update tracks and playlist context
         setTracks(prevTracks => [...(prevTracks || []), ...newTracks]);
-
-        // Ensure prevTracks is always an array
         setPlaylistContext(prevTracks => [...(prevTracks || []), ...newTracks]);
       } catch (err) {
         setError("Failed to fetch data");
@@ -44,7 +43,7 @@ const DisplayAlbum = () => {
     };
 
     fetchData();
-  }, [id, offset]);
+  }, [id, offset, setPlaylistContext]);
 
   // IntersectionObserver setup
   useEffect(() => {
@@ -68,11 +67,12 @@ const DisplayAlbum = () => {
     };
   }, [loading, hasMore]);
 
-  const play = (track, e) => {
+  const play = useCallback((track, e) => {
     e.preventDefault();
+  
     playTrack(track);
     setTrack(track);
-  };
+  }, [playTrack, setTrack]);
 
   if (loading && tracks.length === 0) {
     return <p>Loading...</p>;
@@ -81,14 +81,13 @@ const DisplayAlbum = () => {
   if (error) {
     return <p>{error}</p>;
   }
-
   return (
     <div className={`bg-${playlist?.primary_color}`}>
       {playlist && (
         <div className="mt-10 flex gap-8 flex-col md:flex-row md:items-end">
           <img
             className="w-48 rounded"
-            src={playlist?.images[0]?.url || assets.default_album_cover}
+            src={playlist?.images[0]?.url || '/path/to/default_album_cover.jpg'}
             alt={`${playlist?.name} cover`}
           />
           <div className="flex flex-col">
@@ -133,7 +132,7 @@ const DisplayAlbum = () => {
             <div className="flex items-center">
               <b className="mr-4 text-[#a7a7a7]">{index + 1}</b>
               <img
-                src={track.album.images[0]?.url || assets.default_album_cover}
+                src={track.album.images[0]?.url || '/path/to/default_album_cover.jpg'}
                 alt={track.name}
                 className="w-14 h-14 object-cover rounded-md"
               />

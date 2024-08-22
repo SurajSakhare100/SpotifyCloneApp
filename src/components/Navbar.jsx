@@ -1,24 +1,64 @@
+import React, { useState, useCallback, useEffect } from "react";
 import { FaSearch } from "react-icons/fa";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
-import { useState, useCallback } from "react";
+import debounce from "lodash.debounce";
 import { usePlayer } from "../context/PlayerContext";
-import debounce from "lodash.debounce"; // Make sure to install lodash.debounce
+import Cookies from 'js-cookie';
+const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
+const REDIRECT_URI = "http://localhost:5173/callback";
+const AUTH_ENDPOINT = "https://accounts.spotify.com/authorize";
+const RESPONSE_TYPE = "token";
+const SCOPES = ["user-read-private", "user-read-email"];
 
 const Navbar = () => {
   const { query, setQuery } = usePlayer();
   const navigate = useNavigate();
-  
-  // Debounced search function
+  const [token, setToken] = useState("");
+
+  useEffect(() => {
+    const hash = window.location.hash;
+    let token = Cookies.get("spotify_access_token");
+
+    if (!token && hash) {
+      token = hash
+        .substring(1)
+        .split("&")
+        .find((elem) => elem.startsWith("access_token"))
+        .split("=")[1];
+
+      Cookies.set("spotify_access_token", token, { 
+        expires: 1, 
+        sameSite: 'None', 
+        secure: true 
+      }); // 1 day expiry
+      window.location.hash = ""; // Clear the fragment
+      setToken(token);
+
+      navigate("/");
+    } else if (token) {
+      setToken(token);
+    } else {
+      window.location.href = `${AUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}&scope=${SCOPES.join("%20")}`;
+    }
+  }, [navigate]);
+
+  const logout = () => {
+    Cookies.remove("spotify_access_token", { 
+      sameSite: 'None', 
+      secure: true 
+    });
+    setToken("");
+    window.location.href = `${AUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}&scope=${SCOPES.join("%20")}`;
+  };
   const debouncedSearch = useCallback(
     debounce((query) => {
-      if(query==""){
-        navigate('/search')
-      }
       if (query.trim()) {
         navigate(`/search?query=${encodeURIComponent(query)}`);
+      } else {
+        navigate("/search");
       }
-    }, 300), // 300ms debounce delay
+    }, 300),
     [navigate]
   );
 
@@ -29,20 +69,30 @@ const Navbar = () => {
   };
 
   const handleKeyDown = (event) => {
-    if (event.key === 'Enter') {
-      // Directly navigate on Enter key press
+    if (event.key === "Enter") {
       if (query.trim()) {
         navigate(`/search?query=${encodeURIComponent(query)}`);
       }
     }
   };
+  const handlePrevious = () => {
+  
+    navigate(-1); 
+  };
 
+  const handleNext = () => {
+    navigate(1); // Adjust to your route
+  };
   return (
     <div className="w-full h-16 text-white flex items-center px-10 gap-4">
       <div className="h-full flex items-center gap-2 w-1/3">
-        <FaArrowLeft className="" />
-        <FaArrowRight className="" />
-      </div>
+      <button onClick={handlePrevious} aria-label="Previous Page">
+        <FaArrowLeft />
+      </button>
+      <button onClick={handleNext} aria-label="Next Page">
+        <FaArrowRight />
+      </button>
+    </div>
       <div className="w-1/3 h-12 relative">
         <input
           type="text"
@@ -62,14 +112,25 @@ const Navbar = () => {
         />
       </div>
       <div className="h-full flex items-center gap-4 w-1/3 justify-end">
-        <p className="bg-white text-black text-[15px] px-4 py-1 rounded-2xl hidden md:block cursor-pointer">
-          Explore Premium
-        </p>
-        <p className="bg-black py-1 px-3 rounded-2xl text-[15px] cursor-pointer">
-          Install App
-        </p>
+        {token ? (
+          <button
+            onClick={logout}
+            className="bg-white text-black text-[15px] px-4 py-1 rounded-2xl hidden md:block cursor-pointer"
+          >
+            Logout
+          </button>
+        ) : (
+          <p
+            className="bg-white text-black text-[15px] px-4 py-1 rounded-2xl hidden md:block cursor-pointer"
+            onClick={() => {
+              window.location.href = `${AUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}&scope=${SCOPES.join("%20")}`;
+            }}
+          >
+            Login
+          </p>
+        )}
         <p className="bg-purple-500 text-white w-8 h-8 rounded-full flex items-center justify-center cursor-pointer">
-          C
+          S
         </p>
       </div>
     </div>

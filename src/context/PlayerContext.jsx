@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react';
-import img from '../../public/assets/img5.jpg';
-import song from '../../public/assets/song5.mp3'; // Importing the audio file
+import img from '/assets/img5.jpg';
+import song from '/assets/song5.mp3';
+
 const PlayerContext = createContext();
 
 export const usePlayer = () => useContext(PlayerContext);
@@ -10,7 +11,6 @@ const PlayerContextProvider = ({ children }) => {
   const seekBg = useRef(null);
   const seekBar = useRef(null);
 
-  // Initialize track with default data
   const [track, setTrack] = useState({
     id: '',
     name: 'Illuminati',
@@ -18,13 +18,12 @@ const PlayerContextProvider = ({ children }) => {
       name: 'Illuminati',
       images: [{ url: img }]
     },
-    artists: [{
-      name: "Vinayak Sasikumar"
-    }],
+    artists: [{ name: "Vinayak Sasikumar" }],
     preview_url: song
   });
   const [query, setQuery] = useState("");
   const [playlist, setPlaylistContext] = useState([]);
+  const [artistPlaylist, setArtistPlaylist] = useState([]);
   const [playlistinfo, setPlaylistContextInfo] = useState(null);
   const [playStatus, setPlayStatus] = useState(false);
   const [time, setTime] = useState({
@@ -32,17 +31,27 @@ const PlayerContextProvider = ({ children }) => {
     totalTime: { minute: 0, second: 0 },
   });
 
-  const playTrack = useCallback((currentTrack) => {
+  const playTrack = useCallback(async (currentTrack) => {
     if (currentTrack && audioRef.current) {
-      audioRef.current.src = currentTrack.preview_url;
-      audioRef.current.play().catch(err => console.error('Error playing track:', err));
-      setTrack(currentTrack);
-      setPlayStatus(true);
+      const { preview_url } = currentTrack;
+
+      try {
+        audioRef.current.src = preview_url; // Set the new track URL
+        await audioRef.current.play();
+        setTrack(currentTrack);
+        setPlayStatus(true);
+      } catch (error) {
+        console.error('Error playing audio:', error);
+      }
     }
   }, []);
 
   const play = useCallback(() => {
-    if (audioRef.current) {
+    if (audioRef.current.src) {
+      audioRef.current.play().catch(err => console.error('Error playing audio:', err));
+      setPlayStatus(true);
+    }else{
+      audioRef.current.src=track.preview_url
       audioRef.current.play().catch(err => console.error('Error playing audio:', err));
       setPlayStatus(true);
     }
@@ -105,16 +114,17 @@ const PlayerContextProvider = ({ children }) => {
       }
     };
 
-    if (audioRef.current) {
-      audioRef.current.addEventListener('timeupdate', handleTimeUpdate);
-    }
+    const audioElement = audioRef.current;
+    audioElement.addEventListener('timeupdate', handleTimeUpdate);
 
     return () => {
-      if (audioRef.current) {
-        audioRef.current.removeEventListener('timeupdate', handleTimeUpdate);
-      }
+      audioElement.removeEventListener('timeupdate', handleTimeUpdate);
     };
-  }, [audioRef,playStatus,playlist,track]);
+  }, [audioRef]);
+
+  const handleError = (event) => {
+    console.error("Error playing track:", event);
+  };
 
   const contextValue = {
     audioRef,
@@ -137,11 +147,13 @@ const PlayerContextProvider = ({ children }) => {
     setPlaylistContextInfo,
     query,
     setQuery,
+    artistPlaylist,
+    setArtistPlaylist
   };
 
   return (
     <PlayerContext.Provider value={contextValue}>
-      <audio ref={audioRef} src={track.preview_url}/>
+      <audio ref={audioRef} onError={handleError} />
       {children}
     </PlayerContext.Provider>
   );
