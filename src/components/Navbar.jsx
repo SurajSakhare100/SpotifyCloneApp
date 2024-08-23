@@ -105,7 +105,7 @@ const Navbar = () => {
           type="text"
           ref={searchInput}
           className="w-full h-full outline-none rounded-full bg-[#1c1c1c] pl-10 md:pl-12 pb-1 text-md md:text-lg"
-          placeholder="what's your mood?"
+          placeholder="What's your mood?"
           value={query}
           onChange={handleSearchChange}
           onKeyDown={handleKeyDown}
@@ -138,7 +138,7 @@ const Navbar = () => {
           </p>
         )}
         <div className="bg-purple-500 text-white w-8 h-8 rounded-full flex items-center justify-center cursor-pointer">
-          <img src={spotify} alt="" />
+          <img src={spotify} alt="Spotify Logo" />
         </div>
       </div>
     </div>

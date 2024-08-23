@@ -7,11 +7,13 @@ import SpotifyLogin from "./pages/SpotifyLogin.jsx";
 import Callback from "./pages/Callback.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
     <Router>
       <Routes>
-        <Route path="*" element={<App />} />
         <Route path="/login" element={<SpotifyLogin />} />
         <Route path="/callback" element={<Callback />} />
+        <Route path="*" element={<App />} /> {/* Catch-all route */}
       </Routes>
     </Router>
+  </React.StrictMode>
 );
