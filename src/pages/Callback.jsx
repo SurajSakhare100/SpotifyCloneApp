@@ -1,5 +1,6 @@
-import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+// Callback.jsx
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 
 const Callback = () => {
@@ -8,24 +9,26 @@ const Callback = () => {
   useEffect(() => {
     const hash = window.location.hash;
     if (hash) {
-      const token = hash
-        .substring(1)
-        .split("&")
-        .find(elem => elem.startsWith("access_token"))
-        .split("=")[1];
+      const params = new URLSearchParams(hash.substring(1));
+      const token = params.get('access_token');
 
-      // Store the token in cookies
-      Cookies.set("spotify_access_token", token, { expires: 1, sameSite: 'None', secure: true });
-
-      // Clear the hash from the URL
-      window.location.hash = "";
-
-      // Redirect to the main app
-      navigate("/");
+      if (token) {
+        Cookies.set('spotify_access_token', token, { 
+          expires: 1, // Set expiry as needed
+          sameSite: 'None', 
+          secure: true 
+        });
+        window.location.hash = ''; // Clear the fragment
+        navigate('/'); // Redirect to the home page or wherever needed
+      } else {
+        // Handle error or missing token
+        console.error('Access token not found in URL');
+        navigate('/error'); // Redirect to an error page if needed
+      }
     }
   }, [navigate]);
 
-  return <div>Logging in...</div>;
+  return <div>Processing...</div>;
 };
 
 export default Callback;

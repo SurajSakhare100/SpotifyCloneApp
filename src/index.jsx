@@ -12,7 +12,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <Routes>
         <Route path="/login" element={<SpotifyLogin />} />
         <Route path="/callback" element={<Callback />} />
-        <Route path="*" element={<App />} /> {/* Catch-all route */}
+        <Route path="/" element={<App />} /> {/* Catch-all route */}
       </Routes>
     </Router>
   </React.StrictMode>

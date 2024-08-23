@@ -1,3 +1,4 @@
+// Navbar.jsx
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import { FaSearch } from "react-icons/fa";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
@@ -20,34 +21,16 @@ const Navbar = () => {
   const [token, setToken] = useState("");
 
   useEffect(() => {
-    const hash = window.location.hash;
-    let token = Cookies.get("spotify_access_token");
-
-    if (!token && hash) {
-      token = hash
-        .substring(1)
-        .split("&")
-        .find((elem) => elem.startsWith("access_token"))
-        .split("=")[1];
-
-      Cookies.set("spotify_access_token", token, { 
-        expires: 1, 
-        sameSite: 'None', 
-        secure: true 
-      });
-      window.location.hash = ""; // Clear the fragment
-      setToken(token);
-
-      navigate("/");
-    } else if (token) {
-      setToken(token);
+    const storedToken = Cookies.get('spotify_access_token');
+    if (storedToken) {
+      setToken(storedToken);
     } else {
       window.location.href = `${AUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}&scope=${SCOPES.join("%20")}`;
     }
   }, [navigate]);
 
   const logout = () => {
-    Cookies.remove("spotify_access_token", { 
+    Cookies.remove('spotify_access_token', { 
       sameSite: 'None', 
       secure: true 
     });
@@ -71,7 +54,7 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    handleSearchChange();  // Call the function when query changes
+    handleSearchChange(); // Call the function when query changes
   }, [query]);
 
   const handleKeyDown = (event) => {
@@ -105,7 +88,7 @@ const Navbar = () => {
           type="text"
           ref={searchInput}
           className="w-full h-full outline-none rounded-full bg-[#1c1c1c] pl-10 md:pl-12 pb-1 text-md md:text-lg"
-          placeholder="What's your mood?"
+          placeholder="what's your mood?"
           value={query}
           onChange={handleSearchChange}
           onKeyDown={handleKeyDown}
@@ -138,7 +121,7 @@ const Navbar = () => {
           </p>
         )}
         <div className="bg-purple-500 text-white w-8 h-8 rounded-full flex items-center justify-center cursor-pointer">
-          <img src={spotify} alt="Spotify Logo" />
+          <img src={spotify} alt="" />
         </div>
       </div>
     </div>
