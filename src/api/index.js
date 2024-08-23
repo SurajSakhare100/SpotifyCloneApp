@@ -11,7 +11,6 @@ export async function getSpotifyToken() {
 
   // Create the authorization header
   const credentials = `${clientId}:${clientSecret}`;
-  console.log(credentials)
   const encodedCredentials = btoa(credentials); // For browser environment
   const headers = {
     "Content-Type": "application/x-www-form-urlencoded",
@@ -28,7 +27,6 @@ export async function getSpotifyToken() {
   }
 }
 
-
 export async function getTracks(playlistId, offset = 0) {
   const token = await getSpotifyToken();
   const limit = 10;
@@ -43,147 +41,131 @@ export async function getTracks(playlistId, offset = 0) {
   try {
     const response = await axios.get(playlistUrl, {
       headers,
-      params: {
-        offset,
-        limit,
-      },
+      params: { offset, limit },
     });
 
-    const tracks = response.data.items.map((item) => item.track);
-
-    // Return the fetched tracks
-    return tracks;
+    return response.data.items.map(item => item.track);
   } catch (error) {
-    console.error("Error fetching playlist tracks:", error);
+    console.error("Error fetching playlist tracks:", error.message);
     return [];
   }
 }
 
 export const getTopPlayListInIndia = async () => {
   const token = await getSpotifyToken();
-  const response = await axios.get(
-    "https://api.spotify.com/v1/browse/categories/toplists/playlists?country=IN",
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-  return response.data.playlists.items;
+  if (!token) return [];
+
+  try {
+    const response = await axios.get(
+      "https://api.spotify.com/v1/browse/categories/toplists/playlists?country=IN",
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data.playlists.items;
+  } catch (error) {
+    console.error("Error fetching top playlists:", error.message);
+    return [];
+  }
 };
-export const getSongs = async (query,type) => {
+
+export const getSongs = async (query, type) => {
   const token = await getSpotifyToken();
   if (!token) return null;
-  const response = await axios.get("https://api.spotify.com/v1/search", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    params: {
-      q: query,
-      type,
-      limit: 10,
-    },
-  });
-  let res;
-  if(type=="artist"){
-    res=response.data.artists.items;
+
+  try {
+    const response = await axios.get("https://api.spotify.com/v1/search", {
+      headers: { Authorization: `Bearer ${token}` },
+      params: { q: query, type, limit: 10 },
+    });
+
+    switch (type) {
+      case "artist":
+        return response.data.artists.items;
+      case "playlist":
+        return response.data.playlists.items;
+      case "track":
+        return response.data.tracks.items;
+      default:
+        return [];
+    }
+  } catch (error) {
+    console.error("Error searching for songs:", error.message);
+    return [];
   }
-  else if(type=="playlist"){
-    res=response.data.playlists.items;
-  }
-  else if(type=="track"){
-    res=response.data.tracks.items;
-  }else{
-    res=[];
-  }
-  return res; 
 };
 
 export const getPlaylistData = async (id) => {
   const token = await getSpotifyToken();
   if (!token) return null;
-  const playlistData = await axios.get(
-    `https://api.spotify.com/v1/playlists/${id}`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
 
-  return playlistData.data;
+  try {
+    const playlistData = await axios.get(
+      `https://api.spotify.com/v1/playlists/${id}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    return playlistData.data;
+  } catch (error) {
+    console.error("Error fetching playlist data:", error.message);
+    return null;
+  }
 };
+
 export const getTracksData = async (id) => {
   const token = await getSpotifyToken();
   if (!token) return null;
-  const tracksData = await axios.get(
-    `https://api.spotify.com/v1/tracks/${id}`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
 
-  return tracksData.data;
+  try {
+    const tracksData = await axios.get(
+      `https://api.spotify.com/v1/tracks/${id}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    return tracksData.data;
+  } catch (error) {
+    console.error("Error fetching track data:", error.message);
+    return null;
+  }
 };
 
 export const getCategoryPlaylists = async (categoryId) => {
   const token = await getSpotifyToken();
   if (!token) return null;
-  const config = {
-    method: "get",
-    url: `https://api.spotify.com/v1/browse/categories/${categoryId}/playlists`,
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    params: {
-      limit: 10,
-    },
-  };
 
   try {
-    const response = await axios(config);
-    const playlists = response.data.playlists.items;
-
-    return playlists;
+    const response = await axios.get(
+      `https://api.spotify.com/v1/browse/categories/${categoryId}/playlists`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { limit: 10 },
+      }
+    );
+    return response.data.playlists.items;
   } catch (error) {
-    console.error("Error fetching top artists:", error.response.data);
+    console.error("Error fetching category playlists:", error.message);
+    return [];
   }
 };
 
 export const TopArtists = async () => {
   const token = await getSpotifyToken();
-  if (!token) {
-    throw new Error("Unable to fetch Spotify token");
-  }
+  if (!token) throw new Error("Unable to fetch Spotify token");
 
   const headers = {
     Authorization: `Bearer ${token}`,
   };
 
   try {
-    const requests = artistNames.map((name) => {
-      const url = `https://api.spotify.com/v1/search`;
-      return axios.get(url, {
+    const requests = artistNames.map(name =>
+      axios.get("https://api.spotify.com/v1/search", {
         headers,
-        params: {
-          q: name,
-          type: "artist",
-          limit: 1,
-        },
-      });
-    });
+        params: { q: name, type: "artist", limit: 1 },
+      })
+    );
 
     const responses = await Promise.all(requests);
-    const artists = responses.map((response) => {
-      const artist = response.data.artists.items[0];
-      return artist;
-    });
-
-    return artists;
+    return responses.map(response => response.data.artists.items[0]);
   } catch (error) {
-    console.error("Error fetching artist information:", error);
+    console.error("Error fetching artist information:", error.message);
     throw new Error("Error fetching artist information");
   }
 };
@@ -216,38 +198,35 @@ TopArtists(artistNames);
 export const fetchArtistsAlbums = async (artistId) => {
   try {
     const token = await getSpotifyToken();
-    if (!token) {
-      throw new Error("Unable to fetch Spotify token");
-    }
+    if (!token) throw new Error("Unable to fetch Spotify token");
 
     const headers = {
       Authorization: `Bearer ${token}`,
     };
+
     const response = await axios.get(
-      `https://api.spotify.com/v1/artists/${artistId}/top-tracks`,{headers}
+      `https://api.spotify.com/v1/artists/${artistId}/top-tracks`,
+      { headers }
     );
     return response.data.tracks;
   } catch (error) {
-    console.error("Error fetching albums:", error);
+    console.error("Error fetching albums:", error.message);
+    return [];
   }
 };
-
 
 export const getArtistById = async (id) => {
   const token = await getSpotifyToken();
   if (!token) return null;
-  const config = {
-    method: "get",
-    url: `https://api.spotify.com/v1/artists/${id}`,
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  };
 
   try {
-    const response = await axios(config);
+    const response = await axios.get(
+      `https://api.spotify.com/v1/artists/${id}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
     return response.data;
   } catch (error) {
-    console.error("Error fetching top artists:", error.response.data);
+    console.error("Error fetching artist:", error.message);
+    return null;
   }
 };
