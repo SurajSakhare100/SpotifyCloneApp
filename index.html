@@ -1,46 +1,17 @@
 <!doctype html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Spotify</title>
-
-  <!-- Favicon links -->
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
   <link rel="apple-touch-icon" sizes="180x180" href="/logo.svg">
   <link rel="icon" type="image/svg+xml" sizes="32x32" href="/logo.svg">
   <link rel="icon" type="image/svg+xml" sizes="16x16" href="/logo.svg">
   <meta name="theme-color" content="#000000">
-
-  <!-- Preload critical CSS if available -->
-  <link rel="preload" href="/path/to/critical.css" as="style">
-
-  <!-- Main stylesheet link -->
-  <link rel="stylesheet" href="/path/to/main.css">
-
-  <!-- Ensure styles are applied before content is visible -->
-  <style>
-    /* Critical CSS can be inlined here */
-    /* Example */
-    body {
-      display: none; /* Hide content until styles are fully loaded */
-    }
-  </style>
 </head>
-
 <body>
   <div id="root"></div>
-
-  <!-- Load Vite's JavaScript bundle -->
-  <script type="module" src="/src/index.jsx"></script>
-
-  <!-- Optionally, you can add a small script to remove the inline CSS once the main CSS is loaded -->
-  <script>
-    window.addEventListener('load', () => {
-      document.body.style.display = '';
-    });
-  </script>
+  <script type="module" src="/src/main.jsx"></script>
 </body>
-
 </html>
