@@ -11,7 +11,7 @@ const Callback = () => {
     if (hash) {
       const params = new URLSearchParams(hash.substring(1));
       const token = params.get('access_token');
-
+      console.log(token)
       if (token) {
         Cookies.set('spotify_access_token', token, { 
           expires: 1, // Set expiry as needed
@@ -19,7 +19,7 @@ const Callback = () => {
           secure: true 
         });
         window.location.hash = ''; // Clear the fragment
-        navigate('/'); // Redirect to the home page or wherever needed
+        navigate('/'); 
       } else {
         // Handle error or missing token
         console.error('Access token not found in URL');
