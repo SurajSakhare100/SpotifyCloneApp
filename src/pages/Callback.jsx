@@ -8,6 +8,7 @@ const Callback = () => {
 
   useEffect(() => {
     const hash = window.location.hash;
+    console.log(hash)
     if (hash) {
       const params = new URLSearchParams(hash.substring(1));
       const token = params.get('access_token');
