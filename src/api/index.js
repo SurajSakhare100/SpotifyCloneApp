@@ -1,6 +1,7 @@
-import axios from "axios";
-import qs from "qs";
+import axios from 'axios';
+import qs from 'qs';
 
+// Fetch environment variables
 const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
 const clientSecret = import.meta.env.VITE_SPOTIFY_CLIENT_SECRET;
 
@@ -10,7 +11,8 @@ export async function getSpotifyToken() {
 
   // Create the authorization header
   const credentials = `${clientId}:${clientSecret}`;
-  const encodedCredentials = btoa(credentials); // Use btoa for Base64 encoding in the browser
+  console.log(credentials)
+  const encodedCredentials = btoa(credentials); // For browser environment
   const headers = {
     "Content-Type": "application/x-www-form-urlencoded",
     Authorization: `Basic ${encodedCredentials}`,
@@ -18,13 +20,14 @@ export async function getSpotifyToken() {
 
   try {
     const response = await axios.post(tokenUrl, data, { headers });
-    // setToken(response.data.access_token);
+    console.log('Spotify Access Token:', response.data.access_token); // Log token for debugging
     return response.data.access_token;
   } catch (error) {
-    console.error("Error getting Spotify token:", error);
+    console.error("Error getting Spotify token:", error.message);
     return null;
   }
 }
+
 
 export async function getTracks(playlistId, offset = 0) {
   const token = await getSpotifyToken();
