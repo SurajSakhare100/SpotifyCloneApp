@@ -8,7 +8,7 @@ import Cookies from 'js-cookie';
 import spotify from '../../public/logo.svg'
 
 const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
-const REDIRECT_URI = "https://spotifyindia.vercel.app/callback";
+const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI;
 const AUTH_ENDPOINT = "https://accounts.spotify.com/authorize";
 const RESPONSE_TYPE = "token";
 const SCOPES = ["user-read-private", "user-read-email"];
