@@ -19,7 +19,6 @@ export async function getSpotifyToken() {
 
   try {
     const response = await axios.post(tokenUrl, data, { headers });
-    console.log('Spotify Access Token:', response.data.access_token); // Log token for debugging
     return response.data.access_token;
   } catch (error) {
     console.error("Error getting Spotify token:", error.message);
