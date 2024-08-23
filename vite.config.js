@@ -7,9 +7,5 @@ dotenv.config();
 
 export default defineConfig({
   plugins: [react()],
-  resolve: {
-    alias: {
-      '@': resolve(__dirname, './src'), // Example alias setup
-    },
-  },
+ 
 });
