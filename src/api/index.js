@@ -68,7 +68,7 @@ export const getTopPlayListInIndia = async () => {
   );
   return response.data.playlists.items;
 };
-export const getSongs = async (query) => {
+export const getSongs = async (query,type) => {
   const token = await getSpotifyToken();
   if (!token) return null;
   const response = await axios.get("https://api.spotify.com/v1/search", {
@@ -77,12 +77,23 @@ export const getSongs = async (query) => {
     },
     params: {
       q: query,
-      type: "track", // Searching for tracks
-      limit: 10, // Limit the results
+      type,
+      limit: 10,
     },
   });
-
-  return response.data.tracks.items; // This will return an array of tracks
+  let res;
+  if(type=="artist"){
+    res=response.data.artists.items;
+  }
+  else if(type=="playlist"){
+    res=response.data.playlists.items;
+  }
+  else if(type=="track"){
+    res=response.data.tracks.items;
+  }else{
+    res=[];
+  }
+  return res; 
 };
 
 export const getPlaylistData = async (id) => {
@@ -98,6 +109,20 @@ export const getPlaylistData = async (id) => {
   );
 
   return playlistData.data;
+};
+export const getTracksData = async (id) => {
+  const token = await getSpotifyToken();
+  if (!token) return null;
+  const tracksData = await axios.get(
+    `https://api.spotify.com/v1/tracks/${id}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return tracksData.data;
 };
 
 export const getCategoryPlaylists = async (categoryId) => {
@@ -124,7 +149,7 @@ export const getCategoryPlaylists = async (categoryId) => {
   }
 };
 
-export const searchArtists = async () => {
+export const TopArtists = async () => {
   const token = await getSpotifyToken();
   if (!token) {
     throw new Error("Unable to fetch Spotify token");
@@ -183,7 +208,7 @@ const artistNames = [
   "Kriti Kharbanda",
   "Sukhwinder Singh",
 ];
-searchArtists(artistNames);
+TopArtists(artistNames);
 
 export const fetchArtistsAlbums = async (artistId) => {
   try {
@@ -201,5 +226,25 @@ export const fetchArtistsAlbums = async (artistId) => {
     return response.data.tracks;
   } catch (error) {
     console.error("Error fetching albums:", error);
+  }
+};
+
+
+export const getArtistById = async (id) => {
+  const token = await getSpotifyToken();
+  if (!token) return null;
+  const config = {
+    method: "get",
+    url: `https://api.spotify.com/v1/artists/${id}`,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+
+  try {
+    const response = await axios(config);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching top artists:", error.response.data);
   }
 };

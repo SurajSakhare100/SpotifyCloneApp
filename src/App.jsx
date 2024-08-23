@@ -2,7 +2,7 @@ import { useContext } from "react"
 import Display from "./components/Display"
 import Player from "./components/Player"
 import Sidebar from "./components/Sidebar"
-import PlayerContextProvider, { usePlayer } from "./context/PlayerContext"
+import PlayerContextProvider from "./context/PlayerContext"
 import Navbar from "./components/Navbar"
 
 const App = () => {
@@ -15,6 +15,7 @@ const App = () => {
           <Display />
         </div>
         <Player />
+        
       </div>
     </PlayerContextProvider>
   )

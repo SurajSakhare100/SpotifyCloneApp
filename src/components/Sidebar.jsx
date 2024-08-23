@@ -1,18 +1,16 @@
 import { useEffect, useState } from "react";
 import { FaHome, FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { searchArtists } from "../api";
+import { TopArtists } from "../api";
 import { usePlayer } from "../context/PlayerContext";
 
 const Sidebar = () => {
   const navigate = useNavigate();
   const [artists, setArtists] = useState([]);
-  const { artistPlaylist,
-    setArtistPlaylist } = usePlayer();
   useEffect(() => {
     const loadArtists = async () => {
       try {
-        const artistData = await searchArtists();
+        const artistData = await TopArtists();
         setArtists(artistData);
       } catch (error) {
         console.error('Error loading artists:', error);
@@ -23,17 +21,16 @@ const Sidebar = () => {
   }, []);
 
   const handleArtistClick = (artist) => {
-    setArtistPlaylist(artist)
-    navigate(`/album/${artist.id}`);
+    navigate(`/artist/${artist.id}`);
   };
   return (
     <div className="w-[25%] h-full p-2 flex-col gap-2 text-white hidden lg:flex">
-      <div className="bg-[#121212] h-[20%] rounded flex flex-col justify-around">
-        <div onClick={()=>navigate('/')} className="flex items-center gap-3 pl-8 rounded-lg py-2 cursor-pointer hover:bg-[#242424]">
+      <div className="bg-[#121212] h-[20%] rounded flex flex-col justify-around px-2">
+        <div onClick={()=>navigate('/')} className="flex items-center text-lg gap-3 pl-8 rounded-lg py-2 cursor-pointer hover:bg-[#242424]">
          <FaHome/>
           <p className="font-b old">Home</p>
         </div>
-        <div className="flex items-center gap-3 pl-8 cursor-pointer py-2 rounded-lg hover:bg-[#242424]" onClick={()=>navigate('/search')}>
+        <div className="flex items-center text-lg  gap-3 pl-8 cursor-pointer py-2 rounded-lg hover:bg-[#242424]" onClick={()=>navigate('/search')}>
           <FaSearch/>
           <p className="font-b old">Search</p>
         </div>
@@ -43,7 +40,7 @@ const Sidebar = () => {
       {artists.map(artist => (
           <li
             key={artist?.id}
-            className="mb-2 cursor-pointer hover:text-blue-600 py-1"
+            className="mb-2 cursor-pointer hover:bg-[#242424] px-2 py-2 rounded-lg"
             onClick={() => handleArtistClick(artist)}
           >
             <div className="flex items-center">

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react';
 import img from '/assets/img5.jpg';
 import song from '/assets/song5.mp3';
+import Modal from '../components/Modal';
 
 const PlayerContext = createContext();
 
@@ -22,8 +23,8 @@ const PlayerContextProvider = ({ children }) => {
     preview_url: song
   });
   const [query, setQuery] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [playlist, setPlaylistContext] = useState([]);
-  const [artistPlaylist, setArtistPlaylist] = useState([]);
   const [playlistinfo, setPlaylistContextInfo] = useState(null);
   const [playStatus, setPlayStatus] = useState(false);
   const [time, setTime] = useState({
@@ -147,13 +148,15 @@ const PlayerContextProvider = ({ children }) => {
     setPlaylistContextInfo,
     query,
     setQuery,
-    artistPlaylist,
-    setArtistPlaylist
+    isModalOpen, 
+    setIsModalOpen
+    
   };
 
   return (
     <PlayerContext.Provider value={contextValue}>
       <audio ref={audioRef} onError={handleError} />
+        {isModalOpen && <Modal/> }
       {children}
     </PlayerContext.Provider>
   );

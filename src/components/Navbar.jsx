@@ -1,10 +1,12 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import { FaSearch } from "react-icons/fa";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import debounce from "lodash.debounce";
 import { usePlayer } from "../context/PlayerContext";
 import Cookies from 'js-cookie';
+import spotify from '../../public/logo.svg'
+
 const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
 const REDIRECT_URI = "http://localhost:5173/callback";
 const AUTH_ENDPOINT = "https://accounts.spotify.com/authorize";
@@ -13,6 +15,7 @@ const SCOPES = ["user-read-private", "user-read-email"];
 
 const Navbar = () => {
   const { query, setQuery } = usePlayer();
+  const searchInput = useRef(null);
   const navigate = useNavigate();
   const [token, setToken] = useState("");
 
@@ -31,7 +34,7 @@ const Navbar = () => {
         expires: 1, 
         sameSite: 'None', 
         secure: true 
-      }); // 1 day expiry
+      });
       window.location.hash = ""; // Clear the fragment
       setToken(token);
 
@@ -51,22 +54,25 @@ const Navbar = () => {
     setToken("");
     window.location.href = `${AUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}&scope=${SCOPES.join("%20")}`;
   };
+
   const debouncedSearch = useCallback(
     debounce((query) => {
       if (query.trim()) {
         navigate(`/search?query=${encodeURIComponent(query)}`);
-      } else {
-        navigate("/search");
       }
     }, 300),
     [navigate]
   );
 
-  const handleSearchChange = (e) => {
-    const value = e.target.value;
-    setQuery(value);
+  const handleSearchChange = () => {
+    const value = searchInput.current.value;
     debouncedSearch(value);
+    setQuery(value);
   };
+
+  useEffect(() => {
+    handleSearchChange();  // Call the function when query changes
+  }, [query]);
 
   const handleKeyDown = (event) => {
     if (event.key === "Enter") {
@@ -75,35 +81,37 @@ const Navbar = () => {
       }
     }
   };
+
   const handlePrevious = () => {
-  
-    navigate(-1); 
+    navigate(-1);
   };
 
   const handleNext = () => {
-    navigate(1); // Adjust to your route
+    navigate(1);
   };
+
   return (
     <div className="w-full h-16 text-white flex items-center px-10 gap-4">
-      <div className="h-full flex items-center gap-2 w-1/3">
-      <button onClick={handlePrevious} aria-label="Previous Page">
-        <FaArrowLeft />
-      </button>
-      <button onClick={handleNext} aria-label="Next Page">
-        <FaArrowRight />
-      </button>
-    </div>
-      <div className="w-1/3 h-12 relative">
+      <div className="h-full flex items-center gap-4 w-1/3">
+        <button onClick={handlePrevious} aria-label="Previous Page">
+          <FaArrowLeft />
+        </button>
+        <button onClick={handleNext} aria-label="Next Page">
+          <FaArrowRight />
+        </button>
+      </div>
+      <div className="w-[300px] md:w-1/3 h-12 relative">
         <input
           type="text"
-          className="w-full h-full outline-none rounded-full bg-[#1c1c1c] pl-12 pb-1 text-lg"
-          placeholder="What do you want to play?"
+          ref={searchInput}
+          className="w-full h-full outline-none rounded-full bg-[#1c1c1c] pl-10 md:pl-12 pb-1 text-md md:text-lg"
+          placeholder="what's your mood?"
           value={query}
           onChange={handleSearchChange}
           onKeyDown={handleKeyDown}
         />
         <FaSearch
-          className="absolute top-[50%] -translate-y-1/2 left-3 text-2xl cursor-pointer"
+          className="absolute top-[50%] -translate-y-1/2 left-3 text-lg md:text-2xl cursor-pointer"
           onClick={() => {
             if (query.trim()) {
               navigate(`/search?query=${encodeURIComponent(query)}`);
@@ -129,9 +137,9 @@ const Navbar = () => {
             Login
           </p>
         )}
-        <p className="bg-purple-500 text-white w-8 h-8 rounded-full flex items-center justify-center cursor-pointer">
-          S
-        </p>
+        <div className="bg-purple-500 text-white w-8 h-8 rounded-full flex items-center justify-center cursor-pointer">
+          <img src={spotify} alt="" />
+        </div>
       </div>
     </div>
   );

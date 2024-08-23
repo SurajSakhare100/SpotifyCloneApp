@@ -82,11 +82,11 @@ const DisplayAlbum = () => {
     return <p>{error}</p>;
   }
   return (
-    <div className={`bg-${playlist?.primary_color}`}>
+    <div className={`bg-${playlist?.primary_color} px-2` }>
       {playlist && (
-        <div className="mt-10 flex gap-8 flex-col md:flex-row md:items-end">
+        <div className="flex gap-8 flex-col md:flex-row md:items-end">
           <img
-            className="w-48 rounded"
+            className="w-28 md:w-48 rounded"
             src={playlist?.images[0]?.url || '/path/to/default_album_cover.jpg'}
             alt={`${playlist?.name} cover`}
           />
@@ -123,36 +123,47 @@ const DisplayAlbum = () => {
       </div>
       <hr />
       {tracks.map((track, index) => (
-        <div
-          key={track.id}
-          onClick={(e) => play(track, e)}
-          className="md:px-4 my-2 grid grid-cols-2 md:grid-cols-3 justify-between gap-2 items-center rounded-md text-[#a7a7a7] hover:bg-[#ffffff16] cursor-pointer"
-        >
-          <div className="flex py-2 gap-4 items-center text-white text-sm md:text-[15px]">
-            <div className="flex items-center">
-              <b className="mr-4 text-[#a7a7a7]">{index + 1}</b>
-              <img
-                src={track.album.images[0]?.url || '/path/to/default_album_cover.jpg'}
-                alt={track.name}
-                className="w-14 h-14 object-cover rounded-md"
-              />
-            </div>
-            <div className="inline-block">
-              <strong>
-                {track.name.length > 20 ? track.name.slice(0, 20) + "..." : track.name}
-              </strong>
-              <p className="text-[12px] text-gray-300">
-                by {track.artists.map((artist) => artist.name).join(", ").slice(0, 20) + (track.artists.length > 1 ? "..." : "")}
-              </p>
-            </div>
-          </div>
-          <p className="text-sm hidden md:block text-white">
-            {track.album.name}
-          </p>
-          <p className="text-sm text-end text-white">
-            {millisecondsToMMSS(track.duration_ms)}
-          </p>
-        </div>
+       <div
+       key={track.id}
+       onClick={(e) => play(track, e)}
+       className="md:px-4 my-2 grid grid-cols-3 gap-2 items-center rounded-md text-[#a7a7a7] hover:bg-[#ffffff16] cursor-pointer"
+     >
+       {/* First Column: Track Number, Image, and Info */}
+       <div className="flex py-2 gap-4 items-center text-white text-sm md:text-[15px] col-span-2 md:col-span-1">
+         <div className="flex items-center">
+           <b className="mr-4 text-[#a7a7a7]">{index + 1}</b>
+           <img
+             src={track.album.images[0]?.url || '/path/to/default_album_cover.jpg'}
+             alt={track.name}
+             className="w-14 h-14 object-cover rounded-md"
+           />
+         </div>
+         <div>
+           <strong>
+             {track.name.length > 20 ? track.name.slice(0, 20) + "..." : track.name}
+           </strong>
+           <p className="text-[12px] text-gray-300">
+             by{" "}
+             {track.artists
+               .map((artist) => artist.name)
+               .join(", ")
+               .slice(0, 20) + (track.artists.length > 1 ? "..." : "")}
+           </p>
+         </div>
+       </div>
+     
+       {/* Second Column: Album Name (Hidden on Mobile) */}
+       <p className="hidden md:block md:col-span-1 text-sm text-white">
+         {track.album.name}
+       </p>
+     
+       {/* Third Column: Track Duration */}
+       <p className="text-sm text-white md:col-span-1 text-end pr-2">
+         {millisecondsToMMSS(track.duration_ms)}
+       </p>
+     </div>
+     
+      
       ))}
       <div ref={loader} className="text-center my-4 py-4">
         {loading && <p>Loading more...</p>}

@@ -61,7 +61,7 @@ const DisplayHome = () => {
       <div className="mb-4">
         <h1 className="my-5 font-bold text-2xl">Today&apos;s Biggest Hits</h1>
         <div className="flex overflow-auto">
-          <ul className="flex  flex-wrap  gap-4 ">
+          <ul className="flex overflow-x-auto md:overscroll-none md:flex-wrap gap-4 ">
             {playlists.map(playlist => (
               <li key={playlist.id} className=' flex-shrink-0 w-48 p-2 '>
                 <Link to={`/playlist/${playlist.id}`}>
@@ -87,7 +87,7 @@ const DisplayHome = () => {
           ))}
         </div>
         <div >
-          <ul className="flex flex-wrap gap-4 ">
+          <ul className="flex overflow-x-auto md:overscroll-none md:flex-wrap gap-4 ">
             {categoryPlaylist?.map((playlist, index) => (
               <li key={playlist.snapshot_id} className=' flex-shrink-0 w-48 p-2 '>
                 <Link to={`/playlist/${playlist.id}`}>
