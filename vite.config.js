@@ -7,8 +7,4 @@ dotenv.config();
 
 export default defineConfig({
   plugins: [react()],
-  server: {
-    https: false, // Ensure HTTPS is disabled
-    port: 5173, // Make sure the port is correct
-  },
 });
