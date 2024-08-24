@@ -36,18 +36,13 @@ const SearchSongs = () => {
 
     handleSearch();
   }, [query, type]);
-  const handleOpenModal = (song) => {
-    setTrack(song);
-    setIsModalOpen(true);
-  };
-
   const handleItemClick = (item) => {
     if (item.type === 'artist') {
       navigate(`/artist/${item.id}`);
     } else if (item.type === 'playlist') {
       navigate(`/playlist/${item.id}`);
     } else if (item.type === 'track') {
-      handleOpenModal(item)
+      setTrack(item);
     }
   };
   return (
@@ -76,6 +71,7 @@ const SearchSongs = () => {
         </div>
 
         }
+        <ul className='z-10'>
         {query && songs.map((item) => {
           // Destructure the necessary properties based on the type of item
           let imageUrl = '';
@@ -106,6 +102,7 @@ const SearchSongs = () => {
             </li>
           );
         })}
+        </ul>
 
 
       </ul>

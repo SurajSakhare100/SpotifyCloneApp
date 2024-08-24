@@ -5,3 +5,10 @@
 ::-webkit-scrollbar{
     display: none;
 }
+.pointer-events-none-but-children > * {
+    pointer-events: auto;
+
+}
+li{
+    list-style: none;
+}

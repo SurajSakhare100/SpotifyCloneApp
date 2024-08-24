@@ -124,7 +124,7 @@ const DisplayAlbum = () => {
       <hr />
       {tracks.map((track, index) => (
        <div
-       key={track.id}
+       key={index}
        onClick={(e) => play(track, e)}
        className="md:px-4 my-2 grid grid-cols-3 gap-2 items-center rounded-md text-[#a7a7a7] hover:bg-[#ffffff16] cursor-pointer"
      >

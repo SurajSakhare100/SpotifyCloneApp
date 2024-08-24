@@ -27,11 +27,15 @@ const PlayerContextProvider = ({ children }) => {
   const [playlist, setPlaylistContext] = useState([]);
   const [playlistinfo, setPlaylistContextInfo] = useState(null);
   const [playStatus, setPlayStatus] = useState(false);
+  const [token, setToken] = useState("");
   const [time, setTime] = useState({
     currentTime: { minute: 0, second: 0 },
     totalTime: { minute: 0, second: 0 },
   });
 
+  useEffect(()=>{
+    audioRef.current.src=track.preview_url;
+  },[track])
   const playTrack = useCallback(async (currentTrack) => {
     if (currentTrack && audioRef.current) {
       const { preview_url } = currentTrack;
@@ -124,7 +128,7 @@ const PlayerContextProvider = ({ children }) => {
   }, [audioRef]);
 
   const handleError = (event) => {
-    console.error("Error playing track:", event);
+    console.log("Error playing track:", event.message);
   };
 
   const contextValue = {
@@ -149,7 +153,8 @@ const PlayerContextProvider = ({ children }) => {
     query,
     setQuery,
     isModalOpen, 
-    setIsModalOpen
+    setIsModalOpen,
+    token, setToken
     
   };
 

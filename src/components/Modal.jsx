@@ -29,7 +29,7 @@ const Modal = () => {
   };
 
   return (
-    <div className='w-80 fixed mt-16 bg-[#111] text-white shadow-md shadow-white p-4 h-screen top-0 right-0 z-90'>
+    <div className='w-80 fixed mt-16 bg-[#111] text-white shadow-md shadow-white p-4 h-screen top-0 right-0 z-20 pointer-events-none pointer-events-none-but-children'>
       <div className='flex items-center justify-between my-2'>
         <h2 className="text-xl font-bold">{track.name}</h2>
         <p onClick={() => handleCloseModal()} className='cursor-pointer'><FaTimes /></p>
