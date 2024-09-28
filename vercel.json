@@ -14,9 +14,5 @@
       "src": "/(.*)",
       "dest": "/index.html"
     }
-  ],
-  "env": {
-    "VITE_API_URL": "@api-url",
-    "VITE_OTHER_ENV_VAR": "@other-env-var"
-  }
+  ]
 }
