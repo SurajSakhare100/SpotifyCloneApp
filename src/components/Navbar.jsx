@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import debounce from "lodash.debounce";
 import { usePlayer } from "../context/PlayerContext";
 import Cookies from 'js-cookie';
-import spotify from '../../public/logo.svg'; // Assuming you want to use the Spotify logo
+import spotify from '../../public/logo.png'; // Assuming you want to use the Spotify logo
 
 const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
 const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI;

@@ -7,7 +7,7 @@ import DisplayArtistsAlbum from "./DisplayArtistsAlbum";
 
 const Display = () => {
   return (
-    <div className="w-[100%] m-2 md:px-6 pt-4 rounded bg-[#121212] text-white overflow-auto w-100 lg:w-[75%] lg:ml-0">
+    <div className="w-full m-2 md:px-6 pt-4 rounded bg-[#121212] text-white overflow-auto lg:w-[75%] lg:ml-0">
       <Routes>
         <Route path="/" element={<DisplayHome />} />
         <Route path="/search" element={<SearchSongs />} />

@@ -11,11 +11,11 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <Router>
       <Routes>
-        <Route path="*" element={<Error/>}/>
-        <Route path="/callback" element={<Callback />} />
-        <Route path="/" element={<App />}>
+        <Route path="*" element={<App />}>
           <Route path="" element={<Display />} />
         </Route>
+          <Route path="/callback" element={<Callback />} />
+        {/* <Route path="*" element={<Error />} /> */}
       </Routes>
     </Router>
   </React.StrictMode>
