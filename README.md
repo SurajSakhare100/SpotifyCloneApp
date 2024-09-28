@@ -1,13 +1,5 @@
-# Spotify Clone 🎧
-
-A Spotify clone built with React JS ,Tailwind CSS and API, showcasing a dynamic and responsive user interface. 
-
-# Project ScreenShots 📸
-
-![SS(1)](https://github.com/user-attachments/assets/77f9282b-6d57-4adb-af81-91c7820dce57)
-![SS(2)](https://github.com/user-attachments/assets/a1b51e3a-c8b1-457a-91f6-49d15bc8e8bc)
-
-A Spotify India Clone! 🎶
+A Spotify India! 🎶
+# Spotify Clone 
 
 Built with React, Tailwind CSS, and powered by the Spotify API, this web app brings the Spotify experience to life! 🎧
 
